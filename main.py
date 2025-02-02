@@ -1,9 +1,9 @@
 import requests
 
-#Função que retorna os dados de todos os usuarios
+# Função que faz uma requisição à API para obter a lista de todos os usuários.
 def busca_usuarios():
 
-    url = 'https://jsonplaceholderr.typicode.com/users/'
+    url = 'https://jsonplaceholder.typicode.com/users/'
     try:
         response = requests.get(url,
             headers = {
@@ -11,16 +11,17 @@ def busca_usuarios():
             },
 
         )
-        response.raise_for_status()
-        return response.json()
+        response.raise_for_status() # Verifica se a requisição foi bem-sucedida
+        return response.json() # Retorna os dados dos usuários em formato JSON.
 
     except requests.RequestException as e:
-        print(f"Erro ao acessar a API: {e}. URL: {url}")
-    
-#Funcao que retorna os dados do usuário com ID especifico
+        print(f"Erro ao acessar a API: {e}. URL: {url}") #Exibe erros de requisição, como falhas de conexão ou URLs inválidas.
+        return None
+
+# Função que faz uma requisição à API para obter os dados de um usuário específico pelo ID.
 def busca_usuario_id(id_usuario):
 
-    url = 'https://jsonplaceholder.typicode.com/users/' + str(id_usuario)
+    url = f'https://jsonplaceholder.typicode.com/users/{id_usuario}'
 
     try:
         response = requests.get(url,
@@ -30,7 +31,7 @@ def busca_usuario_id(id_usuario):
         )
 
         if response.status_code == 200:
-            return response.json()  # Retorna os dados do usuário se ele existir
+            return response.json()  # Retorna os dados do usuário se ele existir, em formato JSON
 
         elif response.status_code == 404:
             return None  # Retorna None se o usuário não existir
@@ -40,11 +41,12 @@ def busca_usuario_id(id_usuario):
 
     except requests.RequestException as e:
         print(f"Erro ao acessar a API: {e}. URL: {url}")
+        return None
 
-#Fun~]ao que retorna os dados do post do usuário
+# Função que faz uma requisição à API para obter os posts de um usuário específico pelo ID.
 def busca_post_user_id(id_usuario):
 
-    url = 'https://jsonplaceholder.typicode.com/posts?userId=' +str(id_usuario)
+    url = f'https://jsonplaceholder.typicode.com/posts?userId={id_usuario}'
     
     try:
         response = requests.get(url,
@@ -65,7 +67,9 @@ def busca_post_user_id(id_usuario):
         
     except requests.RequestException as e:
         print(f"Erro ao acessar a API: {e}. URL: {url}")
+        return None
 
+#Função que exibe o menu para o usuário
 def menu():
     print("\n============================= Menu =============================")
     print('Digite [ 1 ] para Exibir uma lista dos usuários com seus respectivos IDs e nomes.')
@@ -77,9 +81,9 @@ def main():
     while True:
         menu()
         try:
-            opcao = int(input("Escolha uma opção: ")) 
+            opcao = int(input("\nEscolha uma opção: ")) 
 
-            if opcao == 1:
+            if opcao == 1: #Opção 1: Listar todos os usuários.
 
                 print('\nLista de Usuários\n')
                 usuarios = busca_usuarios()
@@ -87,22 +91,23 @@ def main():
                 for usuario in usuarios:
                     print(f"ID: {usuario['id']} - Nome: {usuario['name']}")
 
-            if opcao == 2:
+            elif opcao == 2: #Opção 2: Buscar um usuário pelo ID.
 
-                usuario_id = (input("Digite o ID do usuário desejado: "))
+                usuario_id = input("Digite o ID do usuário desejado: ")
 
-                if not usuario_id.isdigit() or int(usuario_id) <= 0:
+                if not usuario_id.isdigit() or int(usuario_id) <= 0: #Verifica se o ID é um número positivo válido.
                     print("\nID inválido! Digite um número positivo.")
                     continue
 
-                usuario = busca_usuario_id(usuario_id)
-                titulos = busca_post_user_id(usuario_id)
-
-                if usuario:
+                usuario = busca_usuario_id(usuario_id) #Busca os dados do usuário pelo ID.
+                
+                if usuario: #Se o usuário for encontrado, exibe seus dados.
 
                     print(f"\nNome: {usuario['name']} | Email: {usuario['email']}")
-                    
-                    if titulos:
+
+                    titulos = busca_post_user_id(usuario_id) #Busca os posts do usuário pelo ID.
+
+                    if titulos:  #Se o usuário tiver posts, exibe os títulos.
                         print('\nTitulos dos posts criado por esse usuário:\n')
 
                         for titulo in titulos:
@@ -114,17 +119,17 @@ def main():
                     print(f"\nUsuário com ID {usuario_id} não encontrado.")
 
 
-            elif opcao == 0:
+            elif opcao == 0: #Opção para sair do programa.
 
                 print ('Saindo...')
                 break
             
-            else:
-                print('\nDigite uma opcao valida!')
+            else: #Mensagem para opções invalidas
+                print('\nDigite uma opcao valida! (1, 2 ou 0)')
 
-        except ValueError:
+        except ValueError: #Captura erros de entrada inválida (não numérica).
             print("\nOpção inválida! Digite um número.")
-            continue  # Volta para o menu
+            continue  #Volta para o menu
 
 if __name__ == "__main__":
     main()
